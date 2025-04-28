@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huguini RollPlay</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 105%;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .botones {
+            background-color: aqua;
+            height: 150px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        #div_juego {
+            width: 100%;
+            height: calc(100% - 120px);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="div_juego"></div>
+    <div class="botones">
+        <br>
+        <button id="boton_caminar">Acelerar</button>
+        <button id="boton_frenar">Frenar</button>
+        <button id="boton_izquierda">Izquierda</button>
+        <button id="boton_derecha">Derecha</button>
+        <button id="boton_reproducir_musica">Reproducir música</button>
+        <button id="boton_detener_musica">Detener música</button>
+        <button id="boton_girar_camara_hacia_la_izquierda">Girar cámara hacia la izquierda</button>
+        <button id="boton_girar_camara_hacia_la_derecha">Girar cámara hacia la derecha</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module">
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000);
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(document.getElementById('div_juego').clientWidth, document.getElementById('div_juego').clientHeight);
+        document.getElementById('div_juego').appendChild(renderer.domElement);
+
+        const textureLoader = new THREE.TextureLoader();
+        const textura_bloque = textureLoader.load('imágenes/césped.jpeg');
+        textura_bloque.wrapS = THREE.RepeatWrapping;
+        textura_bloque.wrapT = THREE.RepeatWrapping;
+        textura_bloque.repeat.set(50, 50);
+        const cubo_geometry = new THREE.BoxGeometry(10000, 20, 10000);
+        const cubo_material = new THREE.MeshBasicMaterial({ map: textura_bloque, side: THREE.DoubleSide });
+        const cubo = new THREE.Mesh(cubo_geometry, cubo_material);
+
+        const textureLoader2 = new THREE.TextureLoader();
+        const textura_skybox = textureLoader2.load('imágenes/cielo.jpeg');
+        const skybox_geometry = new THREE.SphereGeometry(1000, 1000, 1000);
+        const skybox_material = new THREE.MeshBasicMaterial({ map: textura_skybox, side: THREE.BackSide });
+        const skybox = new THREE.Mesh(skybox_geometry, skybox_material);
+
+        const textureLoader3 = new THREE.TextureLoader();
+        const textura_coche = textureLoader3.load('imágenes/coche.jpeg');
+        const coche_geometry = new THREE.BoxGeometry(40, 30, 20);
+        const coche_material = new THREE.MeshBasicMaterial({ map: textura_coche, side: THREE.DoubleSide });
+        const coche = new THREE.Mesh(coche_geometry, coche_material);
+
+        const textureLoader4 = new THREE.TextureLoader();
+        const textura_arbol2 = textureLoader4.load('imágenes/árbol.png');
+        const arbol_geometry2 = new THREE.BoxGeometry(40, 50, 10);
+        const arbol_material2 = new THREE.MeshBasicMaterial({ map: textura_arbol2, side: THREE.DoubleSide });
+        const arbol2 = new THREE.Mesh(arbol_geometry2, arbol_material2);
+
+        const textureLoader5 = new THREE.TextureLoader();
+        const textura_arbol3 = textureLoader5.load('imágenes/árbol.png');
+        const arbol_geometry3 = new THREE.BoxGeometry(40, 50, 10);
+        const arbol_material3 = new THREE.MeshBasicMaterial({ map: textura_arbol3, side: THREE.DoubleSide });
+        const arbol3 = new THREE.Mesh(arbol_geometry3, arbol_material3);
+
+        const textureLoader6 = new THREE.TextureLoader();
+        const textura_arbol4 = textureLoader6.load('imágenes/árbol.png');
+        const arbol_geometry4 = new THREE.BoxGeometry(40, 50, 10);
+        const arbol_material4 = new THREE.MeshBasicMaterial({ map: textura_arbol4, side: THREE.DoubleSide });
+        const arbol4 = new THREE.Mesh(arbol_geometry4, arbol_material4);
+
+        scene.add(arbol2);
+        scene.add(arbol3);
+        scene.add(arbol4);
+        scene.add(coche);
+        scene.add(skybox);
+        scene.add(cubo);
+
+        skybox.position.set(100, 100, 5040);
+        coche.position.set(30, 40, 4950);
+        arbol2.position.set(-50, 40, 4800);
+        arbol3.position.set(120, 40, 4550);
+        arbol4.position.set(-30, 40, 4600);
+
+        camera.position.x = 30;
+        camera.position.z = 5020;
+        camera.position.y = 50;
+
+        let intervaloCaminar;
+        let contador_musica = false;
+
+        const musica = new Audio("musica/musica.mp3");
+
+        document.getElementById('boton_reproducir_musica').addEventListener('click', function () {
+            musica.loop = true;
+            musica.play();
+        });
+
+        document.getElementById('boton_detener_musica').addEventListener('click', function () {
+            musica.pause();
+        });
+
+        const velocidadCrecimiento = 0.001;
+        const velocidadMovimiento = 0.5;
+        let movimientoActivo = false;
+
+        document.getElementById('boton_caminar').addEventListener('click', function () {
+            if (!movimientoActivo) {
+                movimientoActivo = true;
+                clearInterval(intervaloCaminar);
+                intervaloCaminar = setInterval(() => {
+                    camera.position.z -= velocidadMovimiento;
+                    skybox.position.z -= velocidadMovimiento;
+                    coche.position.z -= velocidadMovimiento;
+
+                    cubo.scale.z += velocidadCrecimiento;
+                    cubo.position.y -= velocidadCrecimiento * 10;
+                }, 1000 / 60);
+            } else {
+            }
+        });
+
+        document.getElementById('boton_derecha').addEventListener('click', function () {
+            camera.position.x += 50;
+            skybox.position.x += 50;
+            coche.position.x += 50;
+        });
+
+        document.getElementById('boton_izquierda').addEventListener('click', function () {
+            camera.position.x -= 20;
+            skybox.position.x -= 20;
+            coche.position.x -= 20;
+        });
+
+        document.getElementById('boton_girar_camara_hacia_la_derecha').addEventListener('click', function() {
+            camera.rotation.y += 270;         
+        });
+
+        document.getElementById('boton_girar_camara_hacia_la_izquierda').addEventListener('click', function() {
+            camera.rotation.y -= 270;
+        });
+
+        document.getElementById('boton_frenar').addEventListener('click', function () {
+            if (movimientoActivo) {
+                clearInterval(intervaloCaminar);
+                movimientoActivo = false;
+            } else {
+            }
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+    </script>
+</body>
+
+</html>
