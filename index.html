@@ -6,27 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Huguini RollPlay</title>
     <style>
-        body,
+body,
         html {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 105%;
+            height: 100%;
             overflow: hidden;
             background-color: #000;
         }
 
         .botones {
             background-color: aqua;
-            height: 150px;
-            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            gap: 5px;
             padding: 10px;
+            box-sizing: border-box;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        button {
+            min-width: 50px; /* Tamaño más pequeño */
+            max-width: 90px; /* Tamaño más pequeño */
+            padding: 4px 8px; /* Menos padding */
+            font-size: 12px; /* Tamaño de fuente más pequeño */
+            box-sizing: border-box;
         }
 
         #div_juego {
             width: 100%;
             height: calc(100% - 120px);
         }
+
     </style>
 </head>
 
@@ -38,15 +52,25 @@
         <button id="boton_frenar">Frenar</button>
         <button id="boton_izquierda">Izquierda</button>
         <button id="boton_derecha">Derecha</button>
-        <button id="boton_reproducir_musica">Reproducir música</button>
-        <button id="boton_detener_musica">Detener música</button>
-        <button id="boton_girar_camara_hacia_la_izquierda">Girar cámara hacia la izquierda</button>
-        <button id="boton_girar_camara_hacia_la_derecha">Girar cámara hacia la derecha</button>
+        <button id="boton_reproducir_musica">ReproducirMúsica</button>
+        <button id="boton_detener_musica">DetenerMúsica</button>
+        <button id="boton_girar_camara_hacia_la_izquierda">GirarCámaraHaciaLaIzquierda</button>
+        <button id="boton_girar_camara_hacia_la_derecha">GirarCámaraHaciaLaDerecha</button>
+        <button id="boton_reiniciar">ReiniciarJuego</button>
+        <button id="boton_recargar_juego">RecargarJuego</button>
+        <button id="boton_subir_camara">SubirCamara</button>
+        <button id="boton_bajar_camara">BajarCamara</button>
+        <button id="boton_mirar_hacia_abajo">MirarAbajo</button>
+        <button id="boton_mirar_hacia_arriba">MirarArriba</button>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script type="module">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000);
+
+        const luz = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(luz);
 
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(document.getElementById('div_juego').clientWidth, document.getElementById('div_juego').clientHeight);
@@ -67,45 +91,107 @@
         const skybox_material = new THREE.MeshBasicMaterial({ map: textura_skybox, side: THREE.BackSide });
         const skybox = new THREE.Mesh(skybox_geometry, skybox_material);
 
-        const textureLoader3 = new THREE.TextureLoader();
-        const textura_coche = textureLoader3.load('imágenes/coche.jpeg');
-        const coche_geometry = new THREE.BoxGeometry(40, 30, 20);
-        const coche_material = new THREE.MeshBasicMaterial({ map: textura_coche, side: THREE.DoubleSide });
-        const coche = new THREE.Mesh(coche_geometry, coche_material);
+ 
 
-        const textureLoader4 = new THREE.TextureLoader();
-        const textura_arbol2 = textureLoader4.load('imágenes/árbol.png');
-        const arbol_geometry2 = new THREE.BoxGeometry(40, 50, 10);
-        const arbol_material2 = new THREE.MeshBasicMaterial({ map: textura_arbol2, side: THREE.DoubleSide });
-        const arbol2 = new THREE.Mesh(arbol_geometry2, arbol_material2);
+        const loader = new THREE.GLTFLoader();
 
-        const textureLoader5 = new THREE.TextureLoader();
-        const textura_arbol3 = textureLoader5.load('imágenes/árbol.png');
-        const arbol_geometry3 = new THREE.BoxGeometry(40, 50, 10);
-        const arbol_material3 = new THREE.MeshBasicMaterial({ map: textura_arbol3, side: THREE.DoubleSide });
-        const arbol3 = new THREE.Mesh(arbol_geometry3, arbol_material3);
+        loader.load(
+            'modelos/mushroom_house.glb',
+            function(gltf) {
+                scene.add(gltf.scene);
+                gltf.scene.position.set(-30, 40, 4500);
+                gltf.scene.scale.set(500, 500, 500);
+            }
+        );
 
-        const textureLoader6 = new THREE.TextureLoader();
-        const textura_arbol4 = textureLoader6.load('imágenes/árbol.png');
-        const arbol_geometry4 = new THREE.BoxGeometry(40, 50, 10);
-        const arbol_material4 = new THREE.MeshBasicMaterial({ map: textura_arbol4, side: THREE.DoubleSide });
-        const arbol4 = new THREE.Mesh(arbol_geometry4, arbol_material4);
+        const loader2 = new THREE.GLTFLoader();
 
-        scene.add(arbol2);
-        scene.add(arbol3);
-        scene.add(arbol4);
-        scene.add(coche);
+        loader2.load(
+            'modelos/mushroom_house.glb',
+            function(gltf2) {
+                scene.add(gltf2.scene);
+                gltf2.scene.position.set(100, 40, 4500);
+                gltf2.scene.scale.set(500, 500, 500);
+            }
+        );
+
+        const loader3 = new THREE.GLTFLoader();
+
+        loader3.load(
+            'modelos/mushroom_house.glb',
+            function(gltf3) {
+                scene.add(gltf3.scene);
+                gltf3.scene.position.set(-30, 40, 4000);
+                gltf3.scene.scale.set(500, 500, 500);
+            }
+        );
+
+        const loader4 = new THREE.GLTFLoader();
+
+        loader4.load(
+            'modelos/mushroom_house.glb',
+            function(gltf4) {
+                scene.add(gltf4.scene);
+                gltf4.scene.position.set(100, 40, 4000);
+                gltf4.scene.scale.set(500, 500, 500);
+            }
+        );
+
+        const loader5 = new THREE.GLTFLoader();
+
+        let coche;
+
+        loader5.load(
+            'modelos/2006_lamborghini_murcielago_lp640.glb',
+            function (gltf) {
+                coche = gltf.scene;
+                scene.add(coche);
+                coche.position.set(30, 10, 4980);
+                coche.scale.set(1000, 1000, 1000);
+                coche.rotation.y = 191.9;
+            }
+        );
+
+        const loader6 = new THREE.GLTFLoader();
+
+        loader6.load(
+            'modelos/realistic_pine_tree_6_free.glb',
+            function(gltf) {
+                scene.add(gltf.scene);
+                gltf.scene.position.set(-50, 40, 4800);
+                gltf.scene.scale.set(5, 5, 5);
+            }
+        );
+
+        const loader7 = new THREE.GLTFLoader();
+
+        loader7.load(
+            'modelos/realistic_pine_tree_6_free.glb',
+            function(gltf) {
+                scene.add(gltf.scene);
+                gltf.scene.position.set(120, 40, 4550);
+                gltf.scene.scale.set(5, 5, 5);
+            }
+        );
+
+        const loader8 = new THREE.GLTFLoader();
+
+        loader8.load(
+            'modelos/realistic_pine_tree_6_free.glb',
+            function(gltf) {
+                scene.add(gltf.scene);
+                gltf.scene.position.set(-30, 40, 4600);
+                gltf.scene.scale.set(5, 5, 5);
+            }
+        );
+
         scene.add(skybox);
         scene.add(cubo);
 
-        skybox.position.set(100, 100, 5040);
-        coche.position.set(30, 40, 4950);
-        arbol2.position.set(-50, 40, 4800);
-        arbol3.position.set(120, 40, 4550);
-        arbol4.position.set(-30, 40, 4600);
+        skybox.position.set(100, 100, 5100);
 
         camera.position.x = 30;
-        camera.position.z = 5020;
+        camera.position.z = 5050;
         camera.position.y = 50;
 
         let intervaloCaminar;
@@ -122,6 +208,18 @@
             musica.pause();
         });
 
+        document.getElementById('boton_reiniciar').addEventListener('click', function () {
+            skybox.position.set(100, 100, 5100);
+            coche.position.set(30, 10, 4980);
+            camera.position.x = 30;
+            camera.position.z = 5050;
+            camera.position.y = 50;
+        });
+
+        document.getElementById('boton_recargar_juego').addEventListener('click', function() {
+            location.reload();
+        });
+
         const velocidadCrecimiento = 0.001;
         const velocidadMovimiento = 0.5;
         let movimientoActivo = false;
@@ -136,10 +234,25 @@
                     coche.position.z -= velocidadMovimiento;
 
                     cubo.scale.z += velocidadCrecimiento;
-                    cubo.position.y -= velocidadCrecimiento * 10;
                 }, 1000 / 60);
             } else {
             }
+        });
+
+        document.getElementById('boton_subir_camara').addEventListener('click', function() {
+            camera.position.y += 20;
+        });
+
+        document.getElementById('boton_bajar_camara').addEventListener('click', function() {
+            camera.position.y -= 20;
+        });
+
+        document.getElementById('boton_mirar_hacia_arriba').addEventListener('click', function() {
+            camera.rotation.x += Math.PI / 2;
+        });
+
+        document.getElementById('boton_mirar_hacia_abajo').addEventListener('click', function() {
+            camera.rotation.x -= Math.PI / 2;
         });
 
         document.getElementById('boton_derecha').addEventListener('click', function () {
@@ -154,11 +267,11 @@
             coche.position.x -= 20;
         });
 
-        document.getElementById('boton_girar_camara_hacia_la_derecha').addEventListener('click', function() {
-            camera.rotation.y += 270;         
+        document.getElementById('boton_girar_camara_hacia_la_derecha').addEventListener('click', function () {
+            camera.rotation.y += 270;
         });
 
-        document.getElementById('boton_girar_camara_hacia_la_izquierda').addEventListener('click', function() {
+        document.getElementById('boton_girar_camara_hacia_la_izquierda').addEventListener('click', function () {
             camera.rotation.y -= 270;
         });
 
